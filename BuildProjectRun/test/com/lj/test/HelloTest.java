@@ -1,0 +1,29 @@
+package com.lj.test;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class HelloTest {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(HelloTest.class);
+
+	@Test
+	public void hello() {
+		System.out.println("hello!");
+	}
+
+	@Test
+	public void springTest() {
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring-config.xml");
+		JdbcTemplate jdbcTemplate = (JdbcTemplate) context.getBean("oracleJdbcTemplate");
+		List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from tb_vehicle");
+		System.out.println(list);
+	}
+}

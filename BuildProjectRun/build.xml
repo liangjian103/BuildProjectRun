@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BuildProjectRun" default="allwar" basedir=".">
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="build.classes.dir" value="${build.dir}/classes" />
+	<property name="war.dir" value="${basedir}/war" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="develop_conf.dir" value="${basedir}/conf" />
+	<property name="develop-war" value="${war.dir}/develop-war/${ant.project.name}" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="*.jar" />
+		<fileset dir="${develop_conf.dir}" includes="*" />
+	</path>
+
+	<target name="clean">
+		<echo>=== CLEAN ===</echo>
+		<delete dir="${war.dir}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${lib.dir}">
+			<include name="${ant.project.name}.jar" />
+		</delete>
+	</target>
+
+	<target name="init" depends="clean">
+		<echo>=== MKDIR DIR ===</echo>
+		<mkdir dir="${war.dir}" />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.classes.dir}" />
+		<mkdir dir="${develop-war}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<echo>=== COMPILE ===</echo>
+		<echo>=== ${java.home} ===</echo>
+		<echo>Compiling ${src.dir} files ...</echo>
+		<javac debug="on" srcdir="${src.dir}" destdir="${build.classes.dir}" includes="**/*">
+			<compilerarg line="-encoding UTF-8 " />
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<echo>=== PACKAGE ===</echo>
+		<copy todir="${build.classes.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+				<exclude name="*.xml" />
+				<exclude name="*.properties" />
+				<exclude name="*.sh" />
+				<exclude name="*.bat" />
+			</fileset>
+		</copy>
+		<jar jarfile="${lib.dir}/${ant.project.name}.jar" basedir="${build.classes.dir}" />
+	</target>
+
+	<target name="develop-war" depends="jar">
+		<copy todir="${develop-war}">
+			<fileset dir="${lib.dir}" />
+			<fileset dir="${develop_conf.dir}" />
+			<fileset file="${src.dir}/sql.properties" />
+			<fileset file="${src.dir}/config.properties" />
+			<fileset file="${src.dir}/spring-plugins.xml" />
+		</copy>
+		<zip destfile="${develop-war}/../${ant.project.name}.zip" basedir="${develop-war}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${lib.dir}" includes="${ant.project.name}.jar" />
+	</target>
+
+	<target name="allwar">
+		<antcall target="develop-war" />
+	</target>
+</project>
+
+
+
